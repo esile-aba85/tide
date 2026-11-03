@@ -1,0 +1,85 @@
+# Tide / 潮汐
+
+**Local-first, file-based long-term memory runtime for companion agents.**
+
+Tide is the memory kernel extracted from a long-running desktop companion project.
+It treats a directory of plain files as the only source of truth, and derives
+everything else — facts, events, index, daily summaries, handover — from it.
+
+> **Status: P0 scaffold (2026-11).**
+> The package layout, CLI skeleton, privacy gate and CI are in place.
+> The memory kernel itself is being extracted next (`chat` / `serve` / `batch`).
+> `tide init` and `tide doctor` already work.
+
+---
+
+## Why another memory layer?
+
+Most "AI memory" projects start with a vector database and end with a pile of
+unverifiable chunks. Tide starts from the opposite side:
+
+- **A file is a fact.** You can read, diff, back up and repair a companion's
+  memory with `git`, a text editor and your eyes.
+- **Forgetting is a feature.** Facts decay with an Ebbinghaus curve; being
+  recalled strengthens them; stale ones are archived, not silently deleted.
+- **A day is a transaction.** Once a day a batch turns raw conversations into
+  facts/events/summaries, with a snapshot, a watermark and a retry path.
+- **Privacy is a boundary, not a prompt.** What a group channel can see is
+  decided while assembling the prompt, before the model is called.
+
+## The eight invariants
+
+1. **Raw text is the only truth.** Derived files are rebuildable.
+2. **One brain, many channels.** Every raw line carries its channel tag.
+3. **Privacy is enforced at assembly time**, never by asking the model nicely.
+4. **Four rhythms:** seconds (raw) / minutes (state) / days (batch) / months (decay).
+5. **State is not memory.** Mood and affinity live outside the fact table.
+6. **The watermark advances only after a fully successful batch.**
+7. **The model is optional.** Offline mode still exercises the whole memory path.
+8. **One writer per data directory.**
+
+## Install (development)
+
+```bash
+git clone <this-repo> tide
+cd tide
+python -m pip install -e ".[dev]"
+```
+
+Python 3.10+ and no runtime dependencies.
+
+## Quickstart
+
+```bash
+tide init --dir ./her       # memory skeleton + persona template + config
+tide doctor --dir ./her     # check Python, write access, layout
+tide status --dir ./her     # what is in the memory directory
+```
+
+`chat`, `serve`, `batch` and `demo` will land with the kernel (P1). Until then
+they exit with a clear "not extracted yet" message instead of pretending.
+
+## What is in the box
+
+| Layer | Contents |
+|---|---|
+| `tidecore.core` | memory kernel, daily batch, retrieval, forgetting, assembly, state |
+| `tidecore.adapters` | CLI, HTTP, OpenAI-compatible model, file storage |
+| `tidecore.plugins` | optional channel/feature packs (QQ, UI, voice, media) |
+
+## What is deliberately out of scope
+
+GUI, QQ, voice, singing, drawing, camera and Live2D are **not** part of the core.
+They depend on third-party runtimes or non-redistributable assets, and they live
+in separate plugin repositories.
+
+## Documentation
+
+- [Architecture](docs/architecture.md)
+- [Memory format](docs/memory-format.md)
+- [Plugin API](docs/plugin-api.md)
+- [Security](SECURITY.md)
+
+## License
+
+MIT. See [LICENSE](LICENSE).

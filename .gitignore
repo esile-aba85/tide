@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# runtime data: never commit a companion's memory
+data/
+*.log
+
+# local credentials
+.env
+config/llm.json
+config/owner.json
+config/*.bak-*
+
+# tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+tests/_tmp/

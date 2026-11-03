@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tidecore"
+version = "0.1.0"
+description = "Local-first, file-based long-term memory runtime for companion agents."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Tide contributors" }]
+keywords = ["agent", "memory", "long-term-memory", "local-first", "llm", "companion"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+  "import-linter>=2.0",
+]
+
+[project.scripts]
+tide = "tidecore.cli:main"
+tidecore = "tidecore.cli:main"
+
+[project.urls]
+Documentation = "https://github.com/your-org/tide#readme"
+Source = "https://github.com/your-org/tide"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tidecore"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.importlinter]
+root_package = "tidecore"
+
+[[tool.importlinter.contracts]]
+name = "core must not import adapters or plugins"
+type = "forbidden"
+source_modules = ["tidecore.core"]
+forbidden_modules = ["tidecore.adapters", "tidecore.plugins"]
