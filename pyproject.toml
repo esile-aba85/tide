@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tidecore"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local-first, file-based long-term memory runtime for companion agents."
 readme = "README.md"
 requires-python = ">=3.10"

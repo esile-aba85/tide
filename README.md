@@ -6,10 +6,10 @@ Tide is the memory kernel extracted from a long-running desktop companion projec
 It treats a directory of plain files as the only source of truth, and derives
 everything else — facts, events, index, daily summaries, handover — from it.
 
-> **Status: P0 scaffold (2026-11).**
-> The package layout, CLI skeleton, privacy gate and CI are in place.
-> The memory kernel itself is being extracted next (`chat` / `serve` / `batch`).
-> `tide init` and `tide doctor` already work.
+> **Status: P1 (2026-11).**
+> The memory kernel is extracted and works offline: `init`, `doctor`, `status`,
+> `chat`, `batch`, `demo`, `serve`. The three-day demo passes **20/20**.
+> The HTTP adapter is deliberately minimal (single-threaded, loopback by default).
 
 ---
 
@@ -54,17 +54,26 @@ Python 3.10+ and no runtime dependencies.
 tide init --dir ./her       # memory skeleton + persona template + config
 tide doctor --dir ./her     # check Python, write access, layout
 tide status --dir ./her     # what is in the memory directory
+tide chat --dir ./her --offline     # terminal chat; no API key needed
+tide demo --dir ./demo              # 3-day synthetic run + 20-question regression
+tide serve --dir ./her --offline    # GET /health, POST /say
 ```
 
-`chat`, `serve`, `batch` and `demo` will land with the kernel (P1). Until then
-they exit with a clear "not extracted yet" message instead of pretending.
+`chat` and `serve` default to offline mode. To use a real model, set
+`TIDE_API_KEY` and put a model name in `config/llm.json`.
+
+`tide batch` runs the daily consolidation:
+
+```bash
+tide batch --dir ./her --date 2026-11-04 --rules --force
+```
 
 ## What is in the box
 
 | Layer | Contents |
 |---|---|
 | `tidecore.core` | memory kernel, daily batch, retrieval, forgetting, assembly, state |
-| `tidecore.adapters` | CLI, HTTP, OpenAI-compatible model, file storage |
+| `tidecore.adapters` | CLI, HTTP, file storage |
 | `tidecore.plugins` | optional channel/feature packs (QQ, UI, voice, media) |
 
 ## What is deliberately out of scope

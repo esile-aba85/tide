@@ -1,7 +1,7 @@
 # Architecture
 
-> Status: P0. This document describes the target shape; the memory kernel is
-> being extracted from the reference application.
+> Status: P1. The memory kernel is extracted and runs offline; plugins and a
+> model adapter are next.
 
 ## Goal
 

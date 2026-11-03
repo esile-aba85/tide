@@ -11,6 +11,7 @@ import argparse
 import json
 import re
 import sys
+from datetime import date, datetime
 from pathlib import Path
 
 from . import __version__
@@ -42,6 +43,15 @@ DEFAULT_CONFIG = {
     "privacy": {"allow_stranger_private": False},
 }
 
+DEFAULT_OWNER = {
+    "owner_id": "owner",
+    "owner_name": "You",
+    "owner_display": "you",
+    "admins": [],
+    "allow_stranger_private": False,
+    "groups": {},
+}
+
 RAW_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-")
 
 
@@ -67,6 +77,12 @@ def cmd_init(args: argparse.Namespace) -> int:
     config = json.dumps(DEFAULT_CONFIG, ensure_ascii=False, indent=2) + "\n"
     if _write_if_missing(root / "config" / "tide.json", config):
         created.append("config/tide.json")
+    owner = json.dumps(DEFAULT_OWNER, ensure_ascii=False, indent=2) + "\n"
+    if _write_if_missing(root / "config" / "owner.json", owner):
+        created.append("config/owner.json")
+    llm = json.dumps(DEFAULT_CONFIG["llm"], ensure_ascii=False, indent=2) + "\n"
+    if _write_if_missing(root / "config" / "llm.json", llm):
+        created.append("config/llm.json")
 
     print(f"initialised: {root}")
     if created:
@@ -76,6 +92,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         print("  already initialised (nothing overwritten)")
     print("\nnext:")
     print(f"  tide doctor --dir {root}")
+    print(f"  tide chat   --dir {root} --offline")
     return 0
 
 
@@ -156,11 +173,95 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_not_yet(args: argparse.Namespace) -> int:
-    print(f"`{args.command}` needs the memory kernel, which is not extracted yet.")
-    print("P0 ships the package skeleton, `init`, `doctor` and `status`.")
-    print("See https://github.com/your-org/tide for the extraction roadmap.")
-    return 2
+def cmd_chat(args: argparse.Namespace) -> int:
+    from .core.config import Config
+    from .core.service import Service
+
+    root = _root(args)
+    if not (root / "config" / "tide.json").is_file():
+        print(f"not initialised: {root}")
+        print(f"run: tide init --dir {root}")
+        return 1
+
+    cfg = Config.load(root, offline=args.offline)
+    service = Service(cfg, offline=args.offline)
+    owner = cfg.owner_id or "owner"
+
+    print(f"tide chat — data: {root}")
+    print(f"model: {'offline' if args.offline else cfg.llm().model}")
+    print("type 'exit' or Ctrl-D to leave\n")
+
+    while True:
+        try:
+            text = input("you> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+        if not text:
+            continue
+        if text.lower() in {"exit", "quit"}:
+            break
+        result = service.handle(
+            owner,
+            text,
+            session_type="private",
+            channel="cli",
+            now=datetime.now(),
+            offline=args.offline,
+        )
+        if result.reply:
+            for part in result.parts or [result.reply]:
+                print(f"her> {part}")
+            print()
+        else:
+            print(f"her> (no reply: {result.error or 'ignored'})\n")
+    return 0
+
+
+def cmd_batch(args: argparse.Namespace) -> int:
+    from .core.config import Config
+    from .core.service import Service
+
+    root = _root(args)
+    if not (root / "config" / "tide.json").is_file():
+        print(f"not initialised: {root}")
+        print(f"run: tide init --dir {root}")
+        return 1
+
+    cfg = Config.load(root, offline=args.rules)
+    service = Service(cfg, offline=args.rules)
+    target = date.fromisoformat(args.date) if args.date else None
+    result = service.consolidate(target=target, force=args.force, rules=args.rules)
+
+    print(result.message)
+    for error in result.errors:
+        print(f"  error: {error}")
+    print(f"backup: {result.backup or '-'}")
+    return 0 if result.ok else 1
+
+
+def cmd_demo(args: argparse.Namespace) -> int:
+    from .core.demo import run_demo
+
+    passed = run_demo(_root(args))
+    return 0 if passed >= 20 else 1
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    from .adapters.http import run
+    from .core.config import Config
+    from .core.service import Service
+
+    root = _root(args)
+    if not (root / "config" / "tide.json").is_file():
+        print(f"not initialised: {root}")
+        print(f"run: tide init --dir {root}")
+        return 1
+
+    cfg = Config.load(root, offline=args.offline)
+    service = Service(cfg, offline=args.offline)
+    run(service, host=args.host, port=args.port)
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -175,31 +276,35 @@ def build_parser() -> argparse.ArgumentParser:
         ("init", cmd_init, "create the memory skeleton and config"),
         ("doctor", cmd_doctor, "check the local layout"),
         ("status", cmd_status, "show what is in the memory directory"),
+        ("chat", cmd_chat, "talk to her in the terminal"),
+        ("batch", cmd_batch, "run the daily consolidation for a day"),
+        ("demo", cmd_demo, "run the synthetic three-day demo"),
+        ("serve", cmd_serve, "run the HTTP bridge"),
     ]
     for name, func, help_text in specs:
         p = sub.add_parser(name, help=help_text)
         p.add_argument("--dir", default="./her", help="companion data directory")
-        p.set_defaults(func=func)
-
-    pending = [
-        ("chat", "talk to her in the terminal"),
-        ("serve", "run the HTTP bridge"),
-        ("batch", "run the daily consolidation for a day"),
-        ("demo", "run the synthetic three-day demo"),
-    ]
-    for name, help_text in pending:
-        p = sub.add_parser(name, help=help_text)
-        p.add_argument("--dir", default="./her", help="companion data directory")
-        if name == "serve":
-            p.add_argument("--port", type=int, default=8787)
+        if name in {"chat", "serve"}:
+            p.add_argument("--offline", action="store_true", help="do not call a model")
         if name == "batch":
-            p.add_argument("--date", default=None)
-        p.set_defaults(func=cmd_not_yet)
+            p.add_argument("--date", default=None, help="logical day, YYYY-MM-DD")
+            p.add_argument("--force", action="store_true", help="re-run even if up to date")
+            p.add_argument("--rules", action="store_true", help="no model; rule-based only")
+        if name == "serve":
+            p.add_argument("--host", default="127.0.0.1", help="bind address")
+            p.add_argument("--port", type=int, default=8787, help="bind port")
+        p.set_defaults(func=func)
 
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows consoles default to the legacy code page; memory is UTF-8.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = build_parser()
     args = parser.parse_args(argv)
     func = getattr(args, "func", None)
