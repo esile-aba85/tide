@@ -6,6 +6,18 @@ Tide is the memory kernel extracted from a long-running desktop companion projec
 It treats a directory of plain files as the only source of truth, and derives
 everything else — facts, events, index, daily summaries, handover — from it.
 
+> **这个项目是怎么来的.** 我不写代码。想法、方向、要什么不要什么，是我提的；
+> 代码、测试和文档由 AI（DeepSeek Harness 里的 deepseek 模型）写完，我只负责验收。
+> 开源是因为朋友一直好奇「她」到底是怎么记住一个人的 —— 这就是答案：
+> **想法是我的，代码是 AI 写的。**
+>
+> **How this was made.** I don't write code. I had the ideas, set the direction,
+> and decided what was in and out of scope; the implementation, tests and docs
+> were written by an AI (the deepseek model inside DeepSeek Harness), and I
+> reviewed the result. Friends kept asking how a companion actually remembers a
+> person, so I'm publishing the honest answer: **the ideas are mine, the code is
+> the AI's.**
+
 > **Status: P1 (2026-11).**
 > The memory kernel is extracted and works offline: `init`, `doctor`, `status`,
 > `chat`, `batch`, `demo`, `serve`. The three-day demo passes **20/20**.
