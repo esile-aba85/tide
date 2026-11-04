@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 from datetime import datetime, timedelta
 
@@ -17,7 +16,7 @@ from . import clock
 from .config import Config
 from .identity import Gate
 from .memory import Fact, Memory
-from .util import clip, ensure_dir, json_dump, json_load, one_line, read_text, sanitize
+from .util import ensure_dir, json_dump, json_load, sanitize
 
 HER_NAMES = ("小潮", "潮汐", "Tide")
 

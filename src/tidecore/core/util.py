@@ -263,7 +263,7 @@ def parse_table(text: str, expected: int | None = None) -> tuple[list[dict], lis
         if len(cells) != len(header):
             bad.append((lineno, raw))
             continue
-        rows.append(dict(zip(header, cells)))
+        rows.append(dict(zip(header, cells, strict=False)))
     return rows, bad
 
 

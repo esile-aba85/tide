@@ -35,10 +35,6 @@ dev = [
 tide = "tidecore.cli:main"
 tidecore = "tidecore.cli:main"
 
-[project.urls]
-Documentation = "https://github.com/your-org/tide#readme"
-Source = "https://github.com/your-org/tide"
-
 [tool.hatch.build.targets.wheel]
 packages = ["src/tidecore"]
 
@@ -48,7 +44,9 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
-ignore = ["E501"]
+# E741: the lifted kernel uses `l` in a few comprehensions; rename in P2.
+# B005: `.strip(" 了，,。 ")` deliberately strips a character set.
+ignore = ["E501", "E741", "B005"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

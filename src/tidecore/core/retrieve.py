@@ -19,7 +19,7 @@ from pathlib import Path
 from . import forget
 from .config import Config
 from .memory import Fact, Memory, importance_value
-from .util import clip, parse_table, read_text, sections, strip_comments
+from .util import parse_table, read_text
 
 STOP_PHRASES = [
     "你还记得",

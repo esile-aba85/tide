@@ -8,12 +8,10 @@
 
 from __future__ import annotations
 
+import functools
 import json
-import math
 import re
 import shutil
-import tempfile
-import functools
 import threading
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
@@ -21,7 +19,6 @@ from pathlib import Path
 
 from .config import Config
 from .util import (
-    PROJECT_ROOT,
     append_line,
     append_text,
     atomic_write,
@@ -316,7 +313,7 @@ _BAD_FACT_VALUES = {"你", "他", "她", "它", "你们", "他们", "她们", "�
 def _clean_fact_value(value: str) -> str:
     value = re.sub(r"\[[^\]]*\]\([^)]*\)", "", value or "")
     value = re.sub(r"https?://\S+", "", value)
-    value = re.split(r"[（(]", value, 1)[0]  # 括号里多半是补充/吐槽，不进卡
+    value = re.split(r"[（(]", value, maxsplit=1)[0]  # 括号里多半是补充/吐槽，不进卡
     return value.strip(" ，。！？）)[]「」\"'")
 
 
@@ -1956,7 +1953,6 @@ class Memory:
             path = self.raw_path(d, src)
             if not path.exists():
                 continue
-            label = self.raw_source_label(src)
             after_midnight = False
             for raw in read_text(path).splitlines():
                 line = raw.strip()
@@ -2488,7 +2484,7 @@ def merge_hand_sections(existing: str, generated: str) -> str:
     old_sec = sections(strip_comments(existing), 2)
     protected = {}
     # 直接按原文找带标记的标题
-    for title, body in old_sec.items():
+    for title in old_sec:
         raw_block = _raw_section(existing, title)
         if "<!-- 手改 -->" in raw_block:
             protected[title] = raw_block.strip()

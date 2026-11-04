@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 import importlib
-from functools import lru_cache
+from functools import cache
 
 # 功能名 -> 承载它的模块。缺模块 = 没装，探测返回 False。
 FEATURE_MODULES = {
@@ -25,7 +25,7 @@ FEATURE_LABELS = {
 }
 
 
-@lru_cache(maxsize=None)
+@cache
 def has(name: str) -> bool:
     """这个功能装没装。桩模块里 `AVAILABLE = False` 就是没装。"""
     module = FEATURE_MODULES.get(str(name or "").strip().lower())

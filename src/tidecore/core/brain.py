@@ -13,10 +13,10 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 
+from . import usage
 from .assemble import Assembly
 from .config import Config, LLMConfig
 from .util import strip_channel_tag
-from . import usage
 
 
 class LLMError(RuntimeError):

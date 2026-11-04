@@ -13,42 +13,37 @@ from datetime import datetime, timedelta
 
 from . import clock
 from .assemble import Assembly, assemble
-from .brain import LLM, ReplyResult, clean_reply, generate_reply, split_bubbles
+from .brain import LLM, ReplyResult, generate_reply, split_bubbles
 from .config import Config
 from .emotion import Emotion
 from .ext import ExtensionRegistry
 from .features import has as feature_has
+from .guard import GroupGuard
 from .identity import (
     ROLE_OWNER,
-    ROLE_STRANGER,
     SESSION_GROUP,
     SESSION_PRIVATE,
     Gate,
     gate_message,
     identity_payload,
-    log_security,
     role_of,
 )
 from .journal import Journal
-from .guard import GroupGuard
 from .memory import Memory
 from .retrieve import IndexDB
-from .stickers import count as sticker_count, pick as sticker_pick, pick_for as sticker_for, proactive_pick
+from .stickers import count as sticker_count
+from .stickers import pick as sticker_pick
+from .stickers import pick_for as sticker_for
+from .stickers import proactive_pick
 from .util import (
     CHANNEL_LABEL,
-    chars,
     clip,
-    fmt_date,
     fmt_md,
     json_load,
     normalize_question,
     one_line,
-    read_text,
-    sections,
     strip_channel_tag,
-    strip_comments,
 )
-
 
 # 通道 → 她嘴里的说法（定义在 util，装配层也要用同一份）
 
@@ -793,7 +788,8 @@ class Service:
         rewrite_mode = "off"
         rewriter = None
         try:
-            from .rewrite import mode_of, rewrite as rewrite_query
+            from .rewrite import mode_of
+            from .rewrite import rewrite as rewrite_query
 
             rewrite_mode = mode_of(self.cfg)
             llm_rw = LLM(self.cfg)
@@ -843,7 +839,8 @@ class Service:
         ext_actions: list[dict] = []
         allowed_types = ["draw", "sing", "body", *self._action_defs().keys()]
         try:
-            from .actions import body_list, extract as _extract_actions
+            from .actions import body_list
+            from .actions import extract as _extract_actions
 
             cleaned, acts = _extract_actions(result.raw or result.text, types=allowed_types)
             if acts:
@@ -1091,7 +1088,8 @@ class Service:
         """她已经在人话里答应了，图在后台画；好了再从同一条通道发过去。"""
         def work():
             try:
-                from .draw import comment, draw as draw_pic
+                from .draw import comment
+                from .draw import draw as draw_pic
 
                 pic = draw_pic(self.cfg, subject)
                 text = comment(self.cfg, subject, pic.get("seed")) or "喏，画好了。"
@@ -1143,8 +1141,14 @@ class Service:
                 pass
 
     def _run_song_action(self, action, text, sender_id, session_type, group_id, channel):
-        from .song import (group_allowed, learn_style, parse_request, silent_reply,
-                           start_learning, stop_playing)
+        from .song import (
+            group_allowed,
+            learn_style,
+            parse_request,
+            silent_reply,
+            start_learning,
+            stop_playing,
+        )
 
         mode = str(action.get("mode") or "sing").lower()
         if mode not in ("sing", "practice", "stop"):
@@ -1214,7 +1218,8 @@ class Service:
                     subject = ""
             if subject:
                 try:
-                    from .draw import comment, draw as draw_pic
+                    from .draw import comment
+                    from .draw import draw as draw_pic
 
                     pic = draw_pic(self.cfg, subject)
                     reply = comment(self.cfg, subject, pic.get("seed")) or "喏，画好了。"
@@ -1234,8 +1239,15 @@ class Service:
                     )
                     return TurnResult(reply=reply, parts=[reply], meta={"draw_failed": subject})
         try:
-            from .song import (group_allowed, learn_style, llm_ack, parse_request,
-                               reply_text, silent_reply, start_learning)
+            from .song import (
+                group_allowed,
+                learn_style,
+                llm_ack,
+                parse_request,
+                reply_text,
+                silent_reply,
+                start_learning,
+            )
 
             sreq = parse_request(text)
         except Exception:  # noqa: BLE001
@@ -1705,7 +1717,7 @@ class Service:
         )
 
     def rebuild_index(self) -> str:
-        n = IndexDB(self.cfg).rebuild(self.mem)
+        IndexDB(self.cfg).rebuild(self.mem)
         self.mem.set_status({"索引库": "已手动重建"})
         return "索引已重建"
 

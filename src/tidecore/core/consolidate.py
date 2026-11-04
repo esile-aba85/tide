@@ -33,11 +33,7 @@ from .util import (
     fmt_date,
     fmt_md,
     fmt_stamp,
-    md_cell,
     one_line,
-    parse_table,
-    read_text,
-    sanitize,
     sections,
     strip_comments,
     unique,
@@ -277,13 +273,12 @@ class Consolidator:
         except Exception as e:
             errors.append(f"归档: {e}")
 
-        month_note = ""
         # 月压：上个月没压过就补。错过 1 号也能补上，不依赖「今天正好是 1 号」。
         prev_month_day = target.replace(day=1) - timedelta(days=1)
         month_path = self.cfg.month_dir / f"{prev_month_day.year}-{prev_month_day.month:02d}.md"
         if not month_path.exists():
             try:
-                month_note = self._compress_month(prev_month_day)
+                self._compress_month(prev_month_day)
             except Exception as e:
                 errors.append(f"月压: {e}")
 
@@ -462,7 +457,7 @@ class Consolidator:
     def _extract(self, inp: DayInput) -> tuple[Extraction, bool]:
         if self.use_llm != "rules" and self.llm and self.llm.available:
             last: Exception | None = None
-            for attempt in (1, 2):
+            for _attempt in (1, 2):
                 try:
                     ext = self._extract_llm(inp)
                 except (LLMError, ValueError, KeyError, TypeError) as e:

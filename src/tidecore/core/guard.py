@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """群聊熔断：防止她和另一个 AI 互相 @，无限烧 token。
 
 规则（都在 config/knobs.json 里可调）：

@@ -13,7 +13,7 @@ import re
 from datetime import datetime
 
 from . import clock
-from .memory import Fact, Memory, shares_object
+from .memory import Fact, Memory
 from .retrieve import IndexDB
 
 # 不是X，是Y / 猫不是，是狗

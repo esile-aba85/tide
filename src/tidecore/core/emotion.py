@@ -782,7 +782,7 @@ def demo() -> None:
         return "【此刻】" + (render(s, when, channel) or "还行，没什么特别的")
 
     print(_pad("时间", 6) + "  " + _pad("私聊", 44) + "  " + _pad("群聊", 44))
-    for when, kind, s in rows:
+    for when, _kind, s in rows:
         print(_pad(_hhmm(when), 6) + "  "
               + _pad(cell(s, when, "private"), 44) + "  "
               + _pad(cell(s, when, "group"), 44))

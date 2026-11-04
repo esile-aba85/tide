@@ -483,7 +483,8 @@ def assemble(
     image_lines: list[str] = []
     if _IMAGE_HINT.search(query or ""):
         try:
-            from .images import format_line, recall as recall_images
+            from .images import format_line
+            from .images import recall as recall_images
 
             image_lines = [format_line(r) for r in recall_images(cfg, query, limit=2)]
         except Exception:  # noqa: BLE001 图片记忆坏了不影响回话

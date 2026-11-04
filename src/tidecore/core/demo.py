@@ -12,7 +12,7 @@ from pathlib import Path
 
 from .config import Config
 from .service import Service
-from .util import atomic_write, ensure_dir, read_text, table
+from .util import atomic_write, ensure_dir, read_text
 
 DEMO_PERSONA = """你是小潮，一个住在电脑里的陪伴者。
 说话短，不编造记忆里没有的事。"""

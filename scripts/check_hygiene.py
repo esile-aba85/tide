@@ -16,7 +16,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-SKIP_DIRS = {".git", "__pycache__", ".venv", "venv", "build", "dist", ".pytest_cache", "_tmp"}
+SKIP_DIRS = {
+    ".git", "__pycache__", ".venv", "venv", "build", "dist",
+    ".pytest_cache", ".ruff_cache", ".uv-cache", "_tmp",
+}
 SKIP_SUFFIXES = {".pyc", ".pyo", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".zip", ".db"}
 
 PATTERNS = [

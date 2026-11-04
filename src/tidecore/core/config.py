@@ -389,7 +389,7 @@ class Config:
 
     # ------------------------------------------------------------ 构造
     @classmethod
-    def load(cls, root: str | Path | None = None, offline: bool = False) -> "Config":
+    def load(cls, root: str | Path | None = None, offline: bool = False) -> Config:
         root = Path(root).resolve() if root else PROJECT_ROOT
         config_dir = root / "config"
         memory_dir = root / "data" / "memory"
@@ -427,7 +427,7 @@ class Config:
         return cfg
 
     @classmethod
-    def for_test(cls, root: str | Path, owner_id: str = "10001", owner_name: str = "Owner") -> "Config":
+    def for_test(cls, root: str | Path, owner_id: str = "10001", owner_name: str = "Owner") -> Config:
         root = Path(root).resolve()
         cfg = cls(
             root=root,

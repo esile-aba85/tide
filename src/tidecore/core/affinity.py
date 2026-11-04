@@ -18,7 +18,7 @@ import json
 import math
 import random
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 NEUTRAL = 0.35          # 不熟的人：既不亲近也不讨厌
