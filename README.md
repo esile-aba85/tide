@@ -61,6 +61,8 @@ tide status --dir ./her     # what is in the memory directory
 tide chat --dir ./her --offline     # terminal chat; no API key needed
 tide demo --dir ./demo              # 3-day synthetic run + 20-question regression
 tide serve --dir ./her --offline    # GET /health, POST /say
+tide memory-check --dir ./her       # red lines; --fix archives old facts
+tide rollback --dir ./her --name 日批-2026-11-04
 ```
 
 `chat` and `serve` default to offline mode. To use a real model, set

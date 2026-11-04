@@ -21,7 +21,7 @@ def run_verify(
     """跑回归集。
 
     now 固定住「今天」：种子数据是某几天的，不固定就每年都要改题。
-    `python run.py verify --root data/demo --now "2026-10-22 10:00"`
+    `tide demo`
     """
     cfg = Config.load(root)
     service = Service(cfg, offline=True)

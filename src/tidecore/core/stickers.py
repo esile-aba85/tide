@@ -2,7 +2,7 @@
 
 存原图（不压缩），文件名是内容 sha1，天然去重。
 每张图配一句描述（存 `index.json`），靠它做「这句话配哪张图」的匹配；
-描述由识图模型生成，没标过的老图可以 `run.py stickers-tag` 补。
+描述由识图模型生成，没标过的老图可以 `插件 stickers-tag` 补。
 """
 
 from __future__ import annotations

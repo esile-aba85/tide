@@ -62,6 +62,15 @@ class TestScaffold(unittest.TestCase):
         self.assertIn("raw:", out)
         self.assertIn("facts:", out)
 
+    def test_memory_check_and_rollback(self) -> None:
+        self.run_cli("init", "--dir", str(self.root))
+        code, out = self.run_cli("memory-check", "--dir", str(self.root))
+        self.assertEqual(code, 0, out)
+        self.assertIn("finding", out)
+        code, out = self.run_cli("rollback", "--dir", str(self.root))
+        self.assertEqual(code, 1, out)
+        self.assertIn("没有可用", out)
+
     def test_chat_writes_utf8_raw(self) -> None:
         self.run_cli("init", "--dir", str(self.root))
         with mock.patch("builtins.input", side_effect=["我叫阿岚，在做记忆框架。", "exit"]):

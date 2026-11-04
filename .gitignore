@@ -22,6 +22,7 @@ config/*.bak-*
 .mypy_cache/
 .import_linter_cache/
 .uv-cache/
+.uv-tools/
 .coverage
 htmlcov/
 tests/_tmp/

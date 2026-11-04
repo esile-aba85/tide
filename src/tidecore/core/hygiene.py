@@ -143,7 +143,7 @@ def check(mem: Memory) -> list[dict]:
         out.append({"level": level, "code": code, "msg": msg, "hint": hint})
 
     if not mem.cfg.handover_path.exists():
-        add("warn", "handover_missing", "交接.md 还没生成", "等下一次 05:00 日批，或跑 run.py consolidate --force")
+        add("warn", "handover_missing", "交接.md 还没生成", "等下一次 05:00 日批，或跑 tide batch --force")
     elif snap["handover_bytes"] > int(knobs.handover_max_kb) * 1024:
         add(
             "violation",
@@ -157,14 +157,14 @@ def check(mem: Memory) -> list[dict]:
             "warn",
             "facts_many",
             f"事实 {snap['facts']} 行超 {knobs.facts_max_rows} 行",
-            f"run.py memory-check --fix 会把已关闭超过 {knobs.fact_archive_days} 天的搬进 _历史\\事实-归档.md",
+            f"tide memory-check --fix 会把已关闭超过 {knobs.fact_archive_days} 天的搬进 _历史\\事实-归档.md",
         )
     if snap["facts_archivable"]:
         add(
             "warn",
             "facts_archivable",
             f"{snap['facts_archivable']} 条已关闭事实超过 {knobs.fact_archive_days} 天",
-            "run.py memory-check --fix 归档（会先备份）",
+            "tide memory-check --fix 归档（会先备份）",
         )
     if snap["facts_forgettable"]:
         add(
@@ -172,7 +172,7 @@ def check(mem: Memory) -> list[dict]:
             "facts_forgettable",
             f"{snap['facts_forgettable']} 条事实按遗忘曲线已经想不起来了"
             f"（从没被想起、超过 {knobs.forget_archive_days} 天）",
-            "run.py memory-check --fix 搬进 _历史\\事实-遗忘.md（先备份，能翻回来）",
+            "tide memory-check --fix 搬进 _历史\\事实-遗忘.md（先备份，能翻回来）",
         )
     if snap["events_open"] > int(knobs.events_open_max):
         add(
@@ -208,7 +208,7 @@ def check(mem: Memory) -> list[dict]:
     if snap["bad"]:
         add("warn", "bad_lines", f"坏行 {snap['bad']} 行", "打开 _坏行.md 逐条修；坏行不进检索")
     if not snap["backups"]:
-        add("warn", "no_backup", "还没有备份", "跑一次日批，或 run.py memory-check --fix")
+        add("warn", "no_backup", "还没有备份", "跑一次日批，或 tide memory-check --fix")
     return out
 
 

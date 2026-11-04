@@ -614,7 +614,7 @@ class Emotion:
         return mood_tags(advance(load(self.path, now), now), now)
 
     def snapshot(self, now: datetime | None = None) -> dict:
-        """给 `run.py status` 看的：五个数 + 读出来的情绪 + 体质 + 那一句。"""
+        """给 `tide status` 看的：五个数 + 读出来的情绪 + 体质 + 那一句。"""
         now = now or datetime.now()
         st = advance(load(self.path, now), now)
         out = {NAME[k]: round(float(st[k]), 1) for k in KEYS}

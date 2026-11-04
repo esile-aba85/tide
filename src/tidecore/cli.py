@@ -173,6 +173,61 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_memory_check(args: argparse.Namespace) -> int:
+    from .core.config import Config
+    from .core.hygiene import check
+    from .core.service import Service
+
+    root = _root(args)
+    if not (root / "config" / "tide.json").is_file():
+        print(f"not initialised: {root}")
+        print(f"run: tide init --dir {root}")
+        return 1
+
+    service = Service(Config.load(root, offline=True))
+    if getattr(args, "fix", False):
+        from .core.hygiene import fix
+
+        result = fix(service.mem)
+        print(
+            "fixed: facts {facts}, forgotten {forgotten}, events {events}, backup {backup}".format(
+                **result
+            )
+        )
+    findings = check(service.mem)
+    if not findings:
+        print("memory-check: ok")
+        return 0
+
+    violations = 0
+    for finding in findings:
+        level = str(finding.get("level") or "warn")
+        if level == "violation":
+            violations += 1
+        print(f"[{level}] {finding.get('msg')}")
+        hint = str(finding.get("hint") or "").strip()
+        if hint:
+            print(f"  hint: {hint}")
+    print(f"{len(findings)} finding(s), {violations} violation(s)")
+    return 1 if violations else 0
+
+
+def cmd_rollback(args: argparse.Namespace) -> int:
+    from .core.config import Config
+    from .core.service import Service
+
+    root = _root(args)
+    if not (root / "config" / "tide.json").is_file():
+        print(f"not initialised: {root}")
+        print(f"run: tide init --dir {root}")
+        return 1
+
+    service = Service(Config.load(root, offline=True))
+    message = service.rollback(args.name)
+    print(message)
+    return 1 if any(word in message for word in ("失败", "没有", "不合法", "找不到")) else 0
+
+
 def cmd_chat(args: argparse.Namespace) -> int:
     from .core.config import Config
     from .core.service import Service
@@ -276,6 +331,8 @@ def build_parser() -> argparse.ArgumentParser:
         ("init", cmd_init, "create the memory skeleton and config"),
         ("doctor", cmd_doctor, "check the local layout"),
         ("status", cmd_status, "show what is in the memory directory"),
+        ("memory-check", cmd_memory_check, "check memory red lines"),
+        ("rollback", cmd_rollback, "restore a daily-batch snapshot"),
         ("chat", cmd_chat, "talk to her in the terminal"),
         ("batch", cmd_batch, "run the daily consolidation for a day"),
         ("demo", cmd_demo, "run the synthetic three-day demo"),
@@ -293,6 +350,10 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "serve":
             p.add_argument("--host", default="127.0.0.1", help="bind address")
             p.add_argument("--port", type=int, default=8787, help="bind port")
+        if name == "rollback":
+            p.add_argument("--name", default=None, help="snapshot name; newest if omitted")
+        if name == "memory-check":
+            p.add_argument("--fix", action="store_true", help="archive old facts/events (with backup)")
         p.set_defaults(func=func)
 
     return parser

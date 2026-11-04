@@ -65,7 +65,7 @@ def _locked(method):
 _FACT_MIGRATED: set[str] = set()
 
 # 旧版本 gateway 把 Emotion 对象直接 f-string 进了行动记录，盘上留下
-# 「我<dh.emotion.Emotion object at 0x…>」。读写行动记录时统一洗掉：
+# 「我<tidecore.core.emotion.Emotion object at 0x…>」。读写行动记录时统一洗掉：
 # 写的时候挡住新的，读的时候救回旧的。
 _ACTION_OBJ = re.compile(r"<\s*[\w.]+\s+object\s+at\s+0x[0-9a-fA-F]+\s*>")
 
@@ -2520,7 +2520,7 @@ def has_marked_section(text: str) -> bool:
 REGRESSION_TEMPLATE = """<!-- schema: 1 | 20 题回归集：问法 / 期望要点 / 不应出现 / 场景 -->
 # 回归集
 
-> 用 `python run.py verify --root data/demo` 跑。它检查的是「装配进提示词的内容」，
+> 用 `tide demo` 跑。它检查的是「装配进提示词的内容」，
 > 不是模型最终那句回答；模型的话不可复现，装配层可以。
 
 | # | 场景 | 问法 | 期望要点 | 不应出现 | 来源层 |

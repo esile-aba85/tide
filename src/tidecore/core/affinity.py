@@ -126,7 +126,7 @@ def bump(cfg, person_id: str, delta: float, name: str = "",
 
 
 def top(cfg, limit: int = 3, now: datetime | None = None) -> list[tuple[str, float]]:
-    """最熟的几个人，给 `run.py status` 看的。"""
+    """最熟的几个人，给 `tide status` 看的。"""
     now = now or datetime.now()
     rows = []
     for pid, person in (_load(cfg).get("people") or {}).items():
