@@ -48,6 +48,10 @@ python -m pip install -e ".[dev]"
 
 Python 3.10+ and no runtime dependencies.
 
+> The PyPI distribution is **`tidecore`** (the name `tide` is taken by an
+> unrelated project). Both `tide` and `tidecore` console commands are installed.
+> Tide is not published yet; install from source for now.
+
 ## Quickstart
 
 ```bash
