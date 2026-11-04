@@ -1,5 +1,7 @@
 # Tide / 潮汐
 
+[![ci](https://github.com/esile-aba85/tide/actions/workflows/ci.yml/badge.svg)](https://github.com/esile-aba85/tide/actions/workflows/ci.yml)
+
 **Local-first, file-based long-term memory runtime for companion agents.**
 
 Tide is the memory kernel extracted from a long-running desktop companion project.
