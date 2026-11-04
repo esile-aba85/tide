@@ -19,6 +19,7 @@ from .emotion import Emotion
 from .ext import ExtensionRegistry
 from .features import has as feature_has
 from .guard import GroupGuard
+from .hooks import Hooks, Turn
 from .identity import (
     ROLE_OWNER,
     SESSION_GROUP,
@@ -170,9 +171,15 @@ def strip_claim(reply: str) -> str:
 
 
 class Service:
-    def __init__(self, cfg: Config | None = None, offline: bool = False):
+    def __init__(
+        self,
+        cfg: Config | None = None,
+        offline: bool = False,
+        hooks: Hooks | None = None,
+    ):
         self.cfg = cfg or Config.load()
         self.offline = offline
+        self.hooks = hooks or Hooks()
         self.mem = Memory(self.cfg)
         self.mem.ensure_skeleton()
         self.journal = Journal(self.mem)
@@ -383,6 +390,52 @@ class Service:
         self._trim_thread(sess)
 
     # ------------------------------------------------------------ 主入口
+    def turn(
+        self,
+        sender_id: str,
+        text: str,
+        session_type: str = SESSION_PRIVATE,
+        group_id: str | None = None,
+        nickname: str = "",
+        msg_id: str | None = None,
+        now: datetime | None = None,
+        offline: bool | None = None,
+        channel: str = "",
+        images: list[str] | None = None,
+        vision_done: bool = False,
+    ) -> TurnResult:
+        """Run one turn with plugin hooks around :meth:`handle`.
+
+        Adapters should call this instead of ``handle`` so plugins see the turn.
+        """
+        at = now or datetime.now()
+        turn = Turn(
+            sender_id=sender_id,
+            text=text,
+            session_type=session_type,
+            group_id=group_id,
+            channel=channel,
+            at=at,
+            nickname=nickname,
+            images=list(images or []),
+        )
+        self.hooks.run_before(turn)
+        result = self.handle(
+            turn.sender_id,
+            turn.text,
+            session_type=session_type,
+            group_id=group_id,
+            nickname=nickname,
+            msg_id=msg_id,
+            now=at,
+            offline=offline,
+            channel=channel,
+            images=images,
+            vision_done=vision_done,
+        )
+        self.hooks.run_after(turn, result)
+        return result
+
     def handle(
         self,
         sender_id: str,

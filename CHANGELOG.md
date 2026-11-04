@@ -11,6 +11,8 @@ P1 kernel extraction:
 - `tide demo` passes the 20-question regression **20/20**;
 - minimal HTTP adapter: `GET /health`, `GET /status`, `POST /say`;
 - `tide serve` with loopback-by-default binding and optional bridge token;
+- turn hooks: `before_turn` / `after_reply`, isolated so a broken plugin cannot
+  break a conversation;
 - unit tests for CLI, UTF-8 raw writes, rule batch, demo and HTTP;
 - personal identifiers and vendor-specific defaults removed from core.
 

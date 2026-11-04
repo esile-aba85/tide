@@ -201,7 +201,7 @@ def cmd_chat(args: argparse.Namespace) -> int:
             continue
         if text.lower() in {"exit", "quit"}:
             break
-        result = service.handle(
+        result = service.turn(
             owner,
             text,
             session_type="private",

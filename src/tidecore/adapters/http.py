@@ -102,7 +102,7 @@ class _Handler(BaseHTTPRequestHandler):
 
         group_id = str(payload.get("group_id") or "").strip() or None
         session_type = "group" if group_id else "private"
-        result = self.service.handle(
+        result = self.service.turn(
             sender_id,
             text,
             session_type=session_type,
