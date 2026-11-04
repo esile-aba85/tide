@@ -20,6 +20,7 @@ config/*.bak-*
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.import_linter_cache/
 .uv-cache/
 .coverage
 htmlcov/

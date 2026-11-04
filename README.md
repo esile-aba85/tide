@@ -88,10 +88,15 @@ in separate plugin repositories.
 
 ## Documentation
 
+- [开源清单 / What is included](开源清单.md)
+- [架构（中文）](docs/架构.md)
 - [Architecture](docs/architecture.md)
 - [Memory format](docs/memory-format.md)
 - [Plugin API](docs/plugin-api.md)
 - [Security](SECURITY.md)
+
+This repository is self-contained: it never contains personal data, API keys,
+model weights or third-party assets. See the manifest for the exact boundary.
 
 ## License
 
